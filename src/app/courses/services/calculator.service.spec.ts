@@ -1,14 +1,23 @@
+import { TestBed } from "@angular/core/testing";
 import { CalculatorService } from "./calculator.service";
+import { LoggerService } from "./logger.service";
 
 describe("CalculatorService", () => {
   let calculator: CalculatorService, loggerSpy: any;
 
-  // O beforeEach é uma função que executa um bloco de código toda vez que um código irá rodar
-  // Assim, nesse bloco podemos colocar configurações ou criar instâncias que sejam comuns a todos os testes
-  // Evitando duplicações de código e tornando nosso código mais limpo
   beforeEach(() => {
     loggerSpy = jasmine.createSpyObj("LoggerService", ["log"]);
-    calculator = new CalculatorService(loggerSpy);
+
+    // Podemos usar o TestBed para mockar uma espécie de módulo contendo nossos serviços, por exemplo
+    TestBed.configureTestingModule({
+      providers: [
+        CalculatorService,
+        { provide: LoggerService, useValue: loggerSpy },
+      ],
+    });
+
+    // E assim podemos usar o próprio serviço de injeção do TestBed ao invés de inciarmos uma instância de forma manual
+    calculator = TestBed.inject(CalculatorService);
   });
 
   it("should add two numbers", () => {

@@ -1,12 +1,22 @@
-// O Jasmine é um framework que nos permite testar aplicações JS
-// Ao passo que o Karma é um framework que automatiza nossos testes, implementando o hot reload, por exemplo
+import { CalculatorService } from "./calculator.service";
+import { LoggerService } from "./logger.service";
+
 describe("CalculatorService", () => {
   it("should add two numbers", () => {
-    pending(); //Pending faz com que um desde fique pendente de execução e assim não gere erros, muito usada para quando
-    //queremos implementar um teste no futuro, por exemplo
+    const calculator = new CalculatorService(new LoggerService());
+
+    const result = calculator.add(2, 2);
+
+    //Uma boa prática é deixar os expects no final do teste
+    expect(result).toBe(4);
   });
 
   it("should subtract two numbers", () => {
-    pending();
+    const calculator = new CalculatorService(new LoggerService());
+
+    const result = calculator.subtract(2, 2);
+
+    //Além do resultado pretendido, podemos passar tbm uma mensagem que será exiba em caso de falhas
+    expect(result).toBe(0, "unexpected subtraction result");
   });
 });

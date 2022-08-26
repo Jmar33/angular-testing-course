@@ -3,12 +3,10 @@ import { LoggerService } from "./logger.service";
 
 describe("CalculatorService", () => {
   it("should add two numbers", () => {
-    const logger = new LoggerService();
+    // O Jasmine tbm nos permite criar uma inmstância totalmente fake de um determinado objeto
+    // para tanto devemos passar o nome do objeto, e os métodos que o mesmo deve possuir
+    const logger = jasmine.createSpyObj("LoggerService", ["log"]);
 
-    // O Jasmine nos permite criar um espião que irá monitorar determinado objeto, esse espião recebe como parâmetro
-    // um método, esse método será substitudo por um novo método que faz chamadas ao método original, além de contar o número de
-    // vezes que o método original é chamado
-    spyOn(logger, "log");
     const calculator = new CalculatorService(logger);
 
     const result = calculator.add(2, 2);

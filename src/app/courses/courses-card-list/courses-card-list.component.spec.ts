@@ -28,6 +28,7 @@ describe('CoursesCardListComponent', () => {
     .then(() =>{
       fixture = TestBed.createComponent(CoursesCardListComponent)
       component = fixture.componentInstance
+      debugElement = fixture.debugElement
 
     })
   }))
@@ -35,7 +36,6 @@ describe('CoursesCardListComponent', () => {
 
   it("should create the component", () => {
     expect(component).toBeTruthy()
-    console.log(component)
 
   });
 
@@ -43,6 +43,14 @@ describe('CoursesCardListComponent', () => {
   it("should display the course list", () => {
 
     component.courses = setupCourses()
+
+    // Por padrão o angular não atualiza a DOM após a atualização dos dados
+    // para forçarmos esse comportamento devemos usar a chamada para o método
+    // detectChanges
+    fixture.detectChanges()
+
+    console.log(debugElement.nativeElement.outerHTML)
+
     const cards = debugElement.queryAll(By.css('.course-card'))
 
     expect(cards).toBeTruthy("Could not find courses")

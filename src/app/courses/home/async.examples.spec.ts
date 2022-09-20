@@ -1,4 +1,4 @@
-import { fakeAsync, flush, tick } from "@angular/core/testing";
+import { fakeAsync, flush, flushMicrotasks, tick } from "@angular/core/testing";
 import { promise } from "protractor";
 
 fdescribe("Async Testing Examples", () => {
@@ -37,21 +37,13 @@ fdescribe("Async Testing Examples", () => {
     flush();
   }));
 
-  fit("Asynchronous test example - plain Promise", () => {
+  fit("Asynchronous test example - plain Promise", fakeAsync(() => {
     let test = false;
 
     //   Como podemos ver em um cenário de microtasks operações do tipo setTimeout são executadas somente
     //   após a execução de promises
 
     console.log("Creating a promise");
-
-    setTimeout(() => {
-      console.log("setTimeout() first callback triggered");
-    });
-
-    setTimeout(() => {
-      console.log("setTimeout() second callback triggered");
-    });
 
     Promise.resolve()
       .then(() => {
@@ -65,6 +57,8 @@ fdescribe("Async Testing Examples", () => {
       });
 
     console.log("Running test assertions");
+    flushMicrotasks(); //Executa todas as microtasks antes de considerar o teste como concluido
+
     expect(test).toBeTruthy();
-  });
+  }));
 });

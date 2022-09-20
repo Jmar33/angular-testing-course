@@ -1,7 +1,6 @@
 import { fakeAsync, flush, flushMicrotasks, tick } from "@angular/core/testing";
-import { count } from "console";
-import { promise } from "protractor";
 import { of } from "rxjs";
+import { delay } from "rxjs/operators";
 
 fdescribe("Async Testing Examples", () => {
   it("Asynchronous test example with Jasmine done()", (done: DoneFn) => {
@@ -86,19 +85,21 @@ fdescribe("Async Testing Examples", () => {
     expect(counter).toBe(11);
   }));
 
-  it("Asynchronous test example - Observables", () => {
+  it("Asynchronous test example - Observables", fakeAsync(() => {
     let teste = false;
 
     console.log("Creating an observable");
 
-    //   Quandro estamos trabalhando com observables que são emitidos imediatamente, como é o caso do 'of'
-    //   Não precisamos usar o cenário asyncFake
-    const teste$ = of(teste);
+    //  Já quando trabalhamos com observables do tipo assíncrono, é necessário trabalhar com o operador fakeAsync
+    //  além de podemos combinar com os demais operadores utilizados em código assíncrono, como é o caso
+    //   do tick e flush, por exemplo
+    const teste$ = of(teste).pipe(delay(1000));
 
     teste$.subscribe(() => {
       teste = true;
     });
 
+    tick(1000);
     expect(teste).toBe(true);
-  });
+  }));
 });

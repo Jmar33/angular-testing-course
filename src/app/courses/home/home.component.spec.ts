@@ -85,7 +85,7 @@ describe("HomeComponent", () => {
     expect(tabs.length).toBe(2, "Expected to find 2 tabs");
   });
 
-  it("should display advanced courses when tab clicked", () => {
+  it("should display advanced courses when tab clicked", (done: DoneFn) => {
     coursesService.findAllCourses.and.returnValue(of(setupCourses()));
 
     fixture.detectChanges();
@@ -96,16 +96,20 @@ describe("HomeComponent", () => {
     // debbug capturando o click de um elemento nativo ex: el.nativeElement.click()
     // A outra, que é a que está sendo implementada nesse projeto é usando uma função de click
     // disponível no nosso arquivo util
+
     click(tabs[1]);
 
     fixture.detectChanges();
 
-    const cardTitles = el.queryAll(By.css(".mat-card-title"));
+    // Como o animação ao clicar na aba de cursos avançados gera um comportamento assincrono
+    // Devemos combinar o whenStable com a função done para que expect seja exutado somente
+    // quando o componente estiver OK
+    fixture.whenStable().then(() => {
+      const cardTitles = el.queryAll(By.css('.mat-tab-body-active .mat-card-title'));
+      expect(cardTitles.length).toBeGreaterThan(0,);
+      expect(cardTitles[0].nativeElement.textContent).toContain('Angular Security Course');
+      done();
+    });
 
-    expect(cardTitles.length).toBeGreaterThan(0, "Could not find card titles");
-
-    // expect(cardTitles[0].nativeElement.textContent).toContain(
-    //   "Angular Security Course"
-    // );
   });
 });

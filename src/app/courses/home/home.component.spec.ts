@@ -95,7 +95,7 @@ describe("HomeComponent", () => {
   // Com a ajuda do fakeAsync podemos escrever testes assíncronos como se fossem
   // síncronos, o que torna os nosso códigos mais legiveis e mais fáceis de serem
   // mantidos
-  fit("should display advanced courses when tab clicked", fakeAsync(() => {
+  it("should display advanced courses when tab clicked", fakeAsync(() => {
     coursesService.findAllCourses.and.returnValue(of(setupCourses()));
 
     fixture.detectChanges();
@@ -120,5 +120,33 @@ describe("HomeComponent", () => {
     expect(cardTitles[0].nativeElement.textContent).toContain(
       "Angular Security Course"
     );
+  }));
+
+  // O waitForAsync (antigo async) por padrão é mais utilizado no bloco beforeEach()
+  // mas tbm pode ser utilizado para testes de componentes, apesar que nesse cenário
+  // o uso do fakeAsync é mais recomendado já que nos dá maior controle sobre a passagem do tempo
+  it("should display advanced courses when tab clicked", waitForAsync(() => {
+    // O waitForAsync espera a resolução de todos os blocos assíncronos para considerar o teste como encerrado
+    coursesService.findAllCourses.and.returnValue(of(setupCourses()));
+
+    fixture.detectChanges();
+
+    const tabs = el.queryAll(By.css(".mat-tab-label"));
+
+    click(tabs[1]);
+
+    fixture.detectChanges();
+
+    // O whenStable é uma promise que é executada logo após todos os blocos assíncronos serem resolvidos
+    // ou seja, promises e blocos como o setTimeout e setInterval
+    fixture.whenStable().then(() => {
+      const cardTitles = el.queryAll(
+        By.css(".mat-tab-body-active .mat-card-title")
+      );
+      expect(cardTitles.length).toBeGreaterThan(0);
+      expect(cardTitles[0].nativeElement.textContent).toContain(
+        "Angular Security Course"
+      );
+    });
   }));
 });

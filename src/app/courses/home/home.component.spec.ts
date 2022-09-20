@@ -1,4 +1,11 @@
-import { ComponentFixture, TestBed, waitForAsync } from "@angular/core/testing";
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+  tick,
+  waitForAsync,
+} from "@angular/core/testing";
 import { CoursesModule } from "../courses.module";
 import { DebugElement } from "@angular/core";
 
@@ -85,31 +92,33 @@ describe("HomeComponent", () => {
     expect(tabs.length).toBe(2, "Expected to find 2 tabs");
   });
 
-  it("should display advanced courses when tab clicked", (done: DoneFn) => {
+  // Com a ajuda do fakeAsync podemos escrever testes assíncronos como se fossem
+  // síncronos, o que torna os nosso códigos mais legiveis e mais fáceis de serem
+  // mantidos
+  fit("should display advanced courses when tab clicked", fakeAsync(() => {
     coursesService.findAllCourses.and.returnValue(of(setupCourses()));
 
     fixture.detectChanges();
 
     const tabs = el.queryAll(By.css(".mat-tab-label"));
 
-    // Existem algumas maneiras de simular uma operação de click, uma delas é através do
-    // debbug capturando o click de um elemento nativo ex: el.nativeElement.click()
-    // A outra, que é a que está sendo implementada nesse projeto é usando uma função de click
-    // disponível no nosso arquivo util
-
     click(tabs[1]);
 
     fixture.detectChanges();
 
-    // Como o animação ao clicar na aba de cursos avançados gera um comportamento assincrono
-    // Devemos combinar o whenStable com a função done para que expect seja exutado somente
-    // quando o componente estiver OK
-    fixture.whenStable().then(() => {
-      const cardTitles = el.queryAll(By.css('.mat-tab-body-active .mat-card-title'));
-      expect(cardTitles.length).toBeGreaterThan(0,);
-      expect(cardTitles[0].nativeElement.textContent).toContain('Angular Security Course');
-      done();
-    });
+    // Nesse caso, como o que torna o nosso código assíncrono é uma animação do browser
+    // poderiamos usar o tick, passando 16 milisegundos como parâmetro, já que esse é valor
+    // que a callback demora para retornar, mas usar esse função acaba se tornando mais complexo
+    // porque exige um conhecimento específico
+    // tick(16)
+    flush();
 
-  });
+    const cardTitles = el.queryAll(
+      By.css(".mat-tab-body-active .mat-card-title")
+    );
+    expect(cardTitles.length).toBeGreaterThan(0);
+    expect(cardTitles[0].nativeElement.textContent).toContain(
+      "Angular Security Course"
+    );
+  }));
 });

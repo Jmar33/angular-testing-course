@@ -1,4 +1,5 @@
-import { fakeAsync, tick } from "@angular/core/testing";
+import { fakeAsync, flush, tick } from "@angular/core/testing";
+import { promise } from "protractor";
 
 fdescribe("Async Testing Examples", () => {
   it("Asynchronous test example with Jasmine done()", (done: DoneFn) => {
@@ -23,6 +24,7 @@ fdescribe("Async Testing Examples", () => {
 
     //  Uma alternativa a callback done é o fakeAsync, que criar um cenário onde é possível simular a passagem do tempo
 
+    setTimeout(() => {});
     setTimeout(() => {
       test = true;
 
@@ -31,9 +33,38 @@ fdescribe("Async Testing Examples", () => {
       expect(test).toBeTruthy();
     }, 1000);
 
-    // Com a função tick podemos estabelecer o tempo decorrido em milisegundos
-    tick(500);
-    tick(499);
-    tick(1);
+    //   A função tick pode ser substituída pela função flush, que executa os timeouts pendentes
+    flush();
   }));
+
+  fit("Asynchronous test example - plain Promise", () => {
+    let test = false;
+
+    //   Como podemos ver em um cenário de microtasks operações do tipo setTimeout são executadas somente
+    //   após a execução de promises
+
+    console.log("Creating a promise");
+
+    setTimeout(() => {
+      console.log("setTimeout() first callback triggered");
+    });
+
+    setTimeout(() => {
+      console.log("setTimeout() second callback triggered");
+    });
+
+    Promise.resolve()
+      .then(() => {
+        console.log("Promise first then() evalueted successfully");
+
+        return Promise.resolve();
+      })
+      .then(() => {
+        test = true;
+        console.log("Promise second then() evalueted successfully");
+      });
+
+    console.log("Running test assertions");
+    expect(test).toBeTruthy();
+  });
 });
